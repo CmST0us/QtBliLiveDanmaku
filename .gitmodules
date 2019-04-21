@@ -1,0 +1,3 @@
+[submodule "libBliLiveDanmaku"]
+	path = libBliLiveDanmaku
+	url = https://github.com/CmST0us/libBliLiveDanmaku.git
