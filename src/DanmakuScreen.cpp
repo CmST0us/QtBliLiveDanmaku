@@ -1,5 +1,10 @@
 #include <cstring>
 #include <QTimer>
+#include <QNetworkAccessManager>
+#include <QEventLoop>
+#include <QNetworkReply>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include "DanmakuScreen.hpp"
 
 DanmakuScreen::DanmakuScreen(QObject *parent) : QObject(parent),
@@ -8,6 +13,20 @@ DanmakuScreen::DanmakuScreen(QObject *parent) : QObject(parent),
 }
 
 void DanmakuScreen::connectLiveRoom(int roomID) {
+
+    QNetworkRequest req(QUrl(QString::fromStdString(std::string("https://api.live.bilibili.com/room/v1/Room/room_init?id=") + std::to_string(roomID))));
+    QNetworkAccessManager m;
+    QEventLoop loop;
+    QNetworkReply *reply = m.get(req);
+    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+    loop.exec();
+    if (!reply->isFinished()) {
+        return;
+    }
+    auto data = reply->readAll();
+    auto jsonDoc = QJsonDocument::fromJson(data);
+    roomID = jsonDoc["data"]["room_id"].toInt();
+
     this->stopHeartbeat();
     _socket = std::unique_ptr<QWebSocket>(new QWebSocket);
 
