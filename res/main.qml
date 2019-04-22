@@ -100,7 +100,7 @@ Window {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
         onClicked: {
-
+            danmakuScreen.connectLiveRoom(Number(textEdit.text))
         }
     }
 

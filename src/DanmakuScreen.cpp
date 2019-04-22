@@ -4,10 +4,13 @@
 
 DanmakuScreen::DanmakuScreen(QObject *parent) : QObject(parent),
     _decoder{std::unique_ptr<blilive::DanmakuPacketDecoder>(new blilive::DanmakuPacketDecoder)} {
-
+    _heartbeatTimer.callOnTimeout(this, &DanmakuScreen::sendHeartbeat);
 }
 
-void DanmakuScreen::onViewDidLoad() {
+void DanmakuScreen::connectLiveRoom(int roomID) {
+    this->stopHeartbeat();
+    _socket = std::unique_ptr<QWebSocket>(new QWebSocket);
+
     _decoder.get()->mCommandMessageHandler = [&](blilive::DanmakuCommandPacket *p, std::string c) {
         if (c == blilive::DanmakuCommandPacket::Command::RecvDanmaku) {
             auto danmu = static_cast<blilive::DanmakuCommandDanmuMessagePacket *>(p);
@@ -17,17 +20,35 @@ void DanmakuScreen::onViewDidLoad() {
         }
     };
 
-    QObject::connect(&_socket, &QWebSocket::connected, this, [&]() {
+    QObject::connect(_socket.get(), &QWebSocket::connected, this, [&, roomID]() {
        printf("Connected\n");
        blilive::DanmakuAuthPacket auth;
-       auth.mRoomID = 1440094;
+       auth.mRoomID = roomID;
        std::string data = auth.encode();
-       this->_socket.sendBinaryMessage(QByteArray(data.c_str(), static_cast<int>(data.size())));
+       this->_socket->sendBinaryMessage(QByteArray(data.c_str(), static_cast<int>(data.size())));
+       this->startHeartbeat();
     });
 
-    QObject::connect(&_socket, &QWebSocket::binaryMessageReceived, this, [&](const QByteArray &message) {
+    QObject::connect(_socket.get(), &QWebSocket::binaryMessageReceived, this, [&](const QByteArray &message) {
        this->_decoder.get()->dispatch(std::string(message.data(), static_cast<size_t>(message.size())));
     });
 
-    _socket.open(QUrl(QString("wss://broadcastlv.chat.bilibili.com:2245/sub")));
+    QObject::connect(_socket.get(), &QWebSocket::disconnected, this, [&]() {
+        this->stopHeartbeat();
+    });
+
+    _socket->open((QUrl(QString("wss://broadcastlv.chat.bilibili.com:2245/sub"))));
+}
+
+void DanmakuScreen::startHeartbeat() {
+    _heartbeatTimer.start(std::chrono::seconds(30));
+}
+
+void DanmakuScreen::stopHeartbeat() {
+    _heartbeatTimer.stop();
+}
+
+void DanmakuScreen::sendHeartbeat() {
+    blilive::DanmakuHeartbeatPacket heartbeat;
+    _socket->sendBinaryMessage(QByteArray::fromStdString(heartbeat.encode()));
 }
