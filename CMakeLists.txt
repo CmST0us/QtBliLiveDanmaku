@@ -11,9 +11,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt5 COMPONENTS Core Quick WebSockets REQUIRED)
 
 # Add libBliLiveDanmaku
-add_subdirectory(libBliLiveDanmaku)
+set(BliLiveDanmaku_DIR dep/cmake)
+find_package(BliLiveDanmaku REQUIRED)
 
 aux_source_directory(src QTBLI_SRC_DIR)
 add_executable(${PROJECT_NAME} ${QTBLI_SRC_DIR} "res/qml.qrc")
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Quick Qt5::WebSockets)
+
+target_include_directories(${PROJECT_NAME} PRIVATE dep/include)
+target_link_libraries(${PROJECT_NAME} PRIVATE BliLiveDanmaku::BliLiveDanmaku)

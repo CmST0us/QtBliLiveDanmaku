@@ -30,3 +30,20 @@
 *.exe
 *.out
 *.app
+*.xcuserstate
+*.DS_Store
+
+# CMake
+build
+*/CMakeCache.txt
+
+# Visual Studio
+.vs
+CMakeSettings.json
+
+# CLion
+.idea
+cmake-build*
+
+# vendor
+dep/*

@@ -3,6 +3,8 @@
 
 #include <QWebSocket>
 #include <QObject>
+#include <libBliLiveDanmaku/DanmakuPacket.hpp>
+#include <libBliLiveDanmaku/DanmakuPacketDecoder.hpp>
 
 class MyClass : public QObject
 {
@@ -16,6 +18,7 @@ public slots:
     void onViewDidLoad();
 private:
     QWebSocket _socket;
+    std::unique_ptr<blilive::DanmakuPacketDecoder> _decoder;
 };
 
 #endif // MYCLASS_HPP
