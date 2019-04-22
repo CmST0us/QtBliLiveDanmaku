@@ -1,16 +1,16 @@
-#ifndef MYCLASS_HPP
-#define MYCLASS_HPP
+#ifndef DANMAKUSCREEN_HPP
+#define DANMAKUSCREEN_HPP
 
 #include <QWebSocket>
 #include <QObject>
 #include <libBliLiveDanmaku/DanmakuPacket.hpp>
 #include <libBliLiveDanmaku/DanmakuPacketDecoder.hpp>
 
-class MyClass : public QObject
+class DanmakuScreen : public QObject
 {
     Q_OBJECT
 public:
-    explicit MyClass(QObject *parent = nullptr);
+    explicit DanmakuScreen(QObject *parent = nullptr);
     void main();
 signals:
 
@@ -21,4 +21,4 @@ private:
     std::unique_ptr<blilive::DanmakuPacketDecoder> _decoder;
 };
 
-#endif // MYCLASS_HPP
+#endif // DANMAKUSCREEN_HPP

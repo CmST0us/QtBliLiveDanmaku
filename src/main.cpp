@@ -1,7 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlContext>
 #include <QQmlApplicationEngine>
-#include "MyClass.hpp"
+#include "DanmakuScreen.hpp"
 #include <thread>
 int main(int argc, char *argv[])
 {
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
     engine.load(url);
-    MyClass c;
-    engine.rootContext()->setContextProperty("myClass", &c);
+    DanmakuScreen screen;
+    engine.rootContext()->setContextProperty("danmakuScreen", &screen);
     return app.exec();
 }
