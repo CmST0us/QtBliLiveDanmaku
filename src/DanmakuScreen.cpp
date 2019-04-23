@@ -40,11 +40,11 @@ void DanmakuScreen::connectLiveRoom(int roomID) {
     };
 
     QObject::connect(_socket.get(), &QWebSocket::connected, this, [&, roomID]() {
-       printf("Connected\n");
+       std::cout<<"Connected"<<std::endl;
        blilive::DanmakuAuthPacket auth;
        auth.mRoomID = roomID;
        std::string data = auth.encode();
-       this->_socket->sendBinaryMessage(QByteArray(data.c_str(), static_cast<int>(data.size())));
+       this->_socket->sendBinaryMessage(QByteArray::fromStdString(data));
        this->startHeartbeat();
     });
 
